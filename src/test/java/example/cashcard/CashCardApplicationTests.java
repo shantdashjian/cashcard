@@ -18,25 +18,20 @@ class CashCardApplicationTests {
     TestRestTemplate restTemplate;
     @Test
     public void shouldReturnACashCardWhenDataIsSaved() {
-        ResponseEntity<String> response =
-                restTemplate.getForEntity("/cashcards/1", String.class);
+        ResponseEntity<CashCard> response =
+                restTemplate.getForEntity("/cashcards/1", CashCard.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-        DocumentContext documentContext =
-                JsonPath.parse(response.getBody());
-        Number id = documentContext.read("$.id");
-        assertThat(id).isEqualTo(1);
-        Number amount = documentContext.read("$.amount");
-        assertThat(amount).isEqualTo(100.00);
+        CashCard expected = new CashCard(1L, 100.00);
+        CashCard actual = response.getBody();
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
     public void shouldNotReturnACashCardWhenIdNotFound() {
-        ResponseEntity<String> response =
-                restTemplate.getForEntity("/cashcards/1000", String.class);
+        ResponseEntity<CashCard> response =
+                restTemplate.getForEntity("/cashcards/1000", CashCard.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-
-        assertThat(response.getBody()).isBlank();
+        assertThat(response.getBody()).isNull();
     }
 
 }
