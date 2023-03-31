@@ -14,7 +14,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(CashCardController.class)
+@WebMvcTest
 public class CashCardControllerTest {
 
     @Autowired
@@ -26,10 +26,10 @@ public class CashCardControllerTest {
     @Test
     public void shouldReturnACashCardWhenDataIsSaved() throws Exception {
         when(cashCardRepository.findById(1L))
-                .thenReturn(Optional.of(new CashCard(1L, 100.00)));
+                .thenReturn(Optional.of(new CashCard(99L, 100.00)));
         mockMvc.perform(get("/cashcards/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.id", is(99)))
                 .andExpect(jsonPath("$.amount", is(100.00)));
         verify(cashCardRepository, times(1)).findById(1L);
     }
