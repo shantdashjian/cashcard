@@ -27,15 +27,15 @@ public class CashCardJsonTest {
     @BeforeEach
     void setUp() {
         cashCards = Arrays.array(
-                new CashCard(99L, 100.00),
-                new CashCard(100L, 150.00),
-                new CashCard(101L, 200.00)
+                new CashCard(99L, 100.00, "sarah1"),
+                new CashCard(100L, 150.00, "sarah1"),
+                new CashCard(101L, 200.00, "sarah1")
         );
     }
     @Test
     public void cashCardSerializationTest() throws IOException {
         // Arrange
-        CashCard cashCard = new CashCard(99L, 100.00);
+        CashCard cashCard = new CashCard(99L, 100.00, "sarah1");
 
         // Act
         JsonContent<CashCard> jsonCashCard = json.write(cashCard);
@@ -54,7 +54,8 @@ public class CashCardJsonTest {
         String jsonCashCard = """
                     {
                         "id": 99,
-                        "amount": 100.00
+                        "amount": 100.00,
+                        "owner": "sarah1"
                     }
                 """;
         // Act
@@ -81,15 +82,18 @@ public class CashCardJsonTest {
             [
                   {
                     "id": 99,
-                    "amount": 100.00
+                    "amount": 100.00,
+                    "owner": "sarah1"
                   },
                   {
                     "id": 100,
-                    "amount": 150.00
+                    "amount": 150.00,
+                    "owner": "sarah1"
                   },
                   {
                     "id": 101,
-                    "amount": 200.00
+                    "amount": 200.00,
+                    "owner": "sarah1"
                   }
               ]
         """;

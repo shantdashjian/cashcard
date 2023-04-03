@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.security.Principal;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -23,8 +24,9 @@ public class CashCardController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CashCard> findById(@PathVariable Long id) {
-        Optional<CashCard> cashCard = cashCardRepository.findById(id);
+    public ResponseEntity<CashCard> findById(@PathVariable Long id, Principal principal) {
+        Optional<CashCard> cashCard =
+                Optional.ofNullable(cashCardRepository.findByIdAndOwner(id, principal.getName()));
         if (cashCard.isPresent()) {
             return ResponseEntity.ok(cashCard.get());
         } else {
@@ -33,8 +35,9 @@ public class CashCardController {
     }
 
     @GetMapping
-    public ResponseEntity<Collection<CashCard>> findAll(Pageable pageable) {
-        Page<CashCard> page = cashCardRepository.findAll(
+    public ResponseEntity<Collection<CashCard>> findAll(Pageable pageable, Principal principal) {
+        Page<CashCard> page = cashCardRepository.findByOwner(
+                principal.getName(),
                 PageRequest.of(
                         pageable.getPageNumber(),
                         pageable.getPageSize(),
@@ -48,8 +51,16 @@ public class CashCardController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createCashCard(@RequestBody CashCard newCashCard, UriComponentsBuilder uriComponentsBuilder) {
-        CashCard createdCashCard = cashCardRepository.save(newCashCard);
+    public ResponseEntity<Void> createCashCard(
+            @RequestBody CashCard newCashCard,
+            UriComponentsBuilder uriComponentsBuilder,
+            Principal principal) {
+        CashCard cashCardWithOwner = new CashCard(
+                newCashCard.id(),
+                newCashCard.amount(),
+                principal.getName()
+        );
+        CashCard createdCashCard = cashCardRepository.save(cashCardWithOwner);
         URI location =uriComponentsBuilder
                 .path("/cashcards/{id}")
                 .buildAndExpand(createdCashCard.id())
