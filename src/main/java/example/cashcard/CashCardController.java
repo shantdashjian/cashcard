@@ -61,10 +61,39 @@ public class CashCardController {
                 principal.getName()
         );
         CashCard createdCashCard = cashCardRepository.save(cashCardWithOwner);
-        URI location =uriComponentsBuilder
+        URI location = uriComponentsBuilder
                 .path("/cashcards/{id}")
                 .buildAndExpand(createdCashCard.id())
                 .toUri();
         return ResponseEntity.created(location).build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateCashCard(
+            @PathVariable Long id,
+            @RequestBody CashCard updateCashCard,
+            Principal principal) {
+        CashCard cashCardWithOwner = new CashCard(
+                id,
+                updateCashCard.amount(),
+                principal.getName()
+        );
+        if (cashCardRepository.existsByIdAndOwner(id, principal.getName())) {
+            cashCardRepository.save(cashCardWithOwner);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCashCard(
+            @PathVariable Long id,
+            Principal principal
+    ) {
+        if (cashCardRepository.existsByIdAndOwner(id, principal.getName())) {
+            cashCardRepository.deleteById(id);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }
